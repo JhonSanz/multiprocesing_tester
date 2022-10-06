@@ -20,16 +20,10 @@ class DataGetter:
             "EURUSD", mt5.TIMEFRAME_M30, utc_from,
             max_candles
         )
-        mt5.shutdown()
-
         rates_frame = pd.DataFrame(rates)
         rates_frame['time']=pd.to_datetime(rates_frame['time'], unit='s')
-        print(rates_frame)
         return rates_frame
 
-        # pill2kill = threading.Event()
-        # t = threading.Thread(target=read_data, args=[data])
-        # t.start()
-
-        # while not pill2kill.wait(1):
-        #     print(data)
+    def store_tick(ticks: list, market: str):
+        tick = mt5.symbol_info_tick(market)
+        print(tick)

@@ -33,7 +33,7 @@ class Program:
         for item in self.indicators:
             selector = AlgorithmSelector(
                 self.data, item["function"], item["params"])
-            t = threading.Thread(target=selector.select_algorithm())
+            t = threading.Thread(target=selector.select_algorithm)
             self.threads.append(t)
 
     def run(self):
