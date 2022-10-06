@@ -1,6 +1,5 @@
 import MetaTrader5 as mt5
 from termcolor import colored
-from var import CREDENTIALS
 
 class Login:
     def __init__(self, credentials):

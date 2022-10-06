@@ -3,3 +3,7 @@ CREDENTIALS = {
     "password": "Holajeje123",
     "server": "XMGlobal-MT5 2"
 }
+
+CONFIGURATION = {
+    'broker_timezone': 'Europe/Moscow'
+}
