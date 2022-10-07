@@ -75,8 +75,6 @@ class Program:
             thread_indicators = executor.submit(self.thread_indicators)
             self.ia_signal = thread_ia.result()
             self.computed_indicators = thread_indicators.result()
-            print(self.computed_indicators)
-            print(self.ia_signal)
 
     def check_strategy_entries(self):
         pass
@@ -92,13 +90,10 @@ class Program:
             py_time = pd.to_datetime(tick_data["time"], unit='s').to_pydatetime()
             next_candle = self.last_candle + timedelta(
                 seconds=CONFIGURATION["frametime"] * 60)
-            print(py_time)
+            # print(py_time)
             if (py_time > next_candle): # cuando la vela termina
-                print("leyendo data")
                 self._data = self.read_data_mt5()
-                print("data leida, ahora los threads")
                 self.create_threads()
-                print("ahora las operaciones")
                 operation = self.strategy.run(
                     self._data, self.computed_indicators,
                     self.ia_signal
