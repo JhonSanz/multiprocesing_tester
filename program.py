@@ -1,3 +1,4 @@
+import concurrent.futures
 import threading
 from algorithm import AlgorithmSelector
 from get_data import DataGetter
@@ -7,7 +8,7 @@ class Program:
         self.data_getter = data_getter
         self.indicators = indicators
         self.max_candles = max_candles
-        self._data = []
+        self._data = None
         self.threads = []
 
     @property
@@ -29,17 +30,33 @@ class Program:
         """
         self._data = self.data_getter.read_data(self.max_candles)
 
-    def create_threads(self):
-        for item in self.indicators:
-            selector = AlgorithmSelector(
-                self.data, item["function"], item["params"])
-            t = threading.Thread(target=selector.select_algorithm)
-            self.threads.append(t)
+    def proccess_ia(self):
+        return "I am the IA function"
 
+    def proccess_indicators(self):
+        aux_data = self._data.copy()
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            results = executor.map(
+                lambda item: AlgorithmSelector(
+                    self.data, item["function"], item["params"]
+                ).select_algorithm(),
+                self.indicators
+            )
+            for result in results:
+                aux_data = aux_data.join(result)
+            return aux_data
+
+    def create_proccesses(self):
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            proccess_ia = executor.submit(self.proccess_ia)
+            proccess_indicators = executor.submit(self.proccess_indicators)
+            print(proccess_ia.result())
+            self._data = proccess_indicators.result()
+            print(self._data)
+ 
     def run(self):
         self.get_max_candles_count()
         self.initial_data()
-        self.create_threads()
-
-        print(self.data)
-        print(self.threads)
+        self.create_proccesses()
+        print("aqui estoy")
+        # print(self.data)

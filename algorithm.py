@@ -29,5 +29,5 @@ class AlgorithmSelector:
     def select_algorithm(self):
         # self.validate_algorithm_name()
         # self.validate_algorithm_params()
-        getattr(self.data.ta, self.algorithm)(**self.params, append=True)
-        return self.data
+        result = getattr(self.data.ta, self.algorithm)(**self.params)
+        return result

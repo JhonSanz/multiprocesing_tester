@@ -10,10 +10,16 @@ INDICATORS = [
             "length": 11
         }
     },
+    {
+        "function": "rsi",
+        "params": {
+            "length": 10
+        }
+    },
 ]
 
-login_data = Login(CREDENTIALS).login()
-data_getter = DataGetter()
-program = Program(INDICATORS, data_getter)
-program.run()
-
+if __name__ == '__main__':
+    login_data = Login(CREDENTIALS).login()
+    data_getter = DataGetter()
+    program = Program(INDICATORS, data_getter)
+    program.run()
