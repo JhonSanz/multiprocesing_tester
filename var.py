@@ -5,5 +5,7 @@ CREDENTIALS = {
 }
 
 CONFIGURATION = {
-    'broker_timezone': 'Europe/Moscow'
+    "broker_timezone": "Europe/Moscow",
+    "market": "EURUSD",
+    "frametime": 30
 }

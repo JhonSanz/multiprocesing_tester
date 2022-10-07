@@ -1,10 +1,8 @@
-import threading
-import random
-
 import pytz
 import MetaTrader5 as mt5
 import pandas as pd
 from datetime import datetime
+from var import CONFIGURATION
 
 class DataGetter:
     def __init__(self):
@@ -24,6 +22,6 @@ class DataGetter:
         rates_frame['time']=pd.to_datetime(rates_frame['time'], unit='s')
         return rates_frame
 
-    def store_tick(ticks: list, market: str):
-        tick = mt5.symbol_info_tick(market)
-        print(tick)
+    def store_tick(self):
+        tick = mt5.symbol_info_tick(CONFIGURATION["market"])._asdict()
+        return tick
