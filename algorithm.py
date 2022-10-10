@@ -10,9 +10,11 @@ class AlgorithmSelector:
         self.module = None
 
     def validate_algorithm_params(self):
+        keys = set(self.params.keys())
+        keys.add("data")
         if (
-            set(self.params.keys()) !=
-            set(self.function.__code__.co_varnames[1:])
+            keys !=
+            set(self.function.__code__.co_varnames)
         ):
             raise Exception(f"Invalid params {self.params} for {self.algorithm} function")
 
@@ -27,7 +29,10 @@ class AlgorithmSelector:
             raise Exception(f"Function {self.algorithm} not found")
 
     def select_algorithm(self):
-        # self.validate_algorithm_name()
-        # self.validate_algorithm_params()
-        result = getattr(self.data.ta, self.algorithm)(**self.params)
+        if self.params.pop("custom"):
+            self.validate_algorithm_name()
+            self.validate_algorithm_params()
+            result = self.function(self.params, self.data)
+        else:
+            result = getattr(self.data.ta, self.algorithm)(**self.params)
         return result

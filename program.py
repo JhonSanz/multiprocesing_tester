@@ -1,11 +1,15 @@
 import time
+import MetaTrader5 as mt5
 from datetime import datetime, timedelta
 import concurrent.futures
 import pandas as pd
 from algorithm import AlgorithmSelector
 from strategy import Strategy
 from get_data import DataGetter
-from var import CONFIGURATION
+from var import CONFIGURATION, BASE_REQUEST
+from orders import Operation
+from termcolor import colored
+
 
 class Program:
     def __init__(
@@ -30,9 +34,10 @@ class Program:
         self._data = value
 
     def get_max_candles_count(self):
-        self.max_candles = sorted(list(
-            map(lambda x: x["params"]["length"], self.indicators)
-        ), reverse=True)[0]
+        if self.max_candles == 0:
+            self.max_candles = sorted(list(
+                map(lambda x: x["params"]["length"], self.indicators)
+            ), reverse=True)[0]
 
     def read_data_mt5(self):
         """ It gets data from MT5 as initial data.
@@ -46,7 +51,7 @@ class Program:
         return "I am the IA function"
 
     def thread_indicators(self):
-        aux_data = self._data.loc[:, ["open", "close"]].copy()
+        aux_data = self._data.loc[:, ["time", "open", "high", "low", "close"]].copy()
         for item in self.indicators:
             result = AlgorithmSelector(
                     self.data, item["function"], item["params"]
@@ -75,6 +80,7 @@ class Program:
             thread_indicators = executor.submit(self.thread_indicators)
             self.ia_signal = thread_ia.result()
             self.computed_indicators = thread_indicators.result()
+            print(self.computed_indicators)
 
     def check_strategy_entries(self):
         pass
@@ -84,13 +90,12 @@ class Program:
         self._data = self.read_data_mt5()
         self.computed_indicators = self.thread_indicators()
         starttime = time.time()
-
         while True:
             tick_data = self.data_getter.store_tick()
             py_time = pd.to_datetime(tick_data["time"], unit='s').to_pydatetime()
             next_candle = self.last_candle + timedelta(
                 seconds=CONFIGURATION["frametime"] * 60)
-            # print(py_time)
+            print(py_time)
             if (py_time > next_candle): # cuando la vela termina
                 self._data = self.read_data_mt5()
                 self.create_threads()
@@ -99,5 +104,35 @@ class Program:
                     self.ia_signal
                 )
                 print(operation)
+
+            time.sleep(1.0 - ((time.time() - starttime) % 1.0))
+
+    def run_tick(self):
+        point = mt5.symbol_info(CONFIGURATION["market"]).point
+        order_handler = Operation(BASE_REQUEST)
+        first_price = None
+        brick_size = 500 * point
+        starttime = time.time()
+        while True:
+            tick_data = self.data_getter.store_tick()
+            py_time = pd.to_datetime(tick_data["time"], unit='s').to_pydatetime()
+            current_price = tick_data["bid"]
+
+            if first_price is None:
+                first_price = tick_data["bid"]
+            
+            print(f"Precio inicial {first_price} - precio actual {current_price} - fecha {py_time}")
+            spread = tick_data['ask'] - tick_data['bid']
+            print(f"Spread={spread}")
+            if ((current_price - first_price) >= brick_size):
+                print(colored(f"procesando compra {tick_data['bid']}", "yellow"))
+                order_handler.buy(tick_data["bid"], brick_size, spread)
+                first_price = tick_data["bid"]
+                print(colored(f"compra completada", "green"))
+            elif ((first_price - current_price) > brick_size):
+                print(colored("procesando venta", "yellow"))
+                order_handler.sell(tick_data["bid"], brick_size, spread)
+                first_price = tick_data["bid"]
+                print(colored(f"venta completada", "red"))
 
             time.sleep(1.0 - ((time.time() - starttime) % 1.0))

@@ -9,13 +9,13 @@ class DataGetter:
         self.data = []
 
     def read_data(self, max_candles):
-        timezone = pytz.timezone("Europe/Moscow")
+        # timezone = pytz.timezone("Europe/Moscow")
+        timezone = pytz.timezone("Etc/UTC")
         utc_from = datetime.now(tz=timezone)
-        # timezone = pytz.timezone("Etc/UTC")
         # utc_from = datetime.now()
         # print(utc_from)
         rates = mt5.copy_rates_from(
-            "EURUSD", mt5.TIMEFRAME_M30, utc_from,
+            "EURUSD", mt5.TIMEFRAME_M1, utc_from,
             max_candles
         )
         rates_frame = pd.DataFrame(rates)

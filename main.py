@@ -3,30 +3,14 @@ from var import CREDENTIALS
 from program import Program
 from get_data import DataGetter
 from strategy import Strategy
+from programv2 import ProgramV2
 
 INDICATORS = [
     {
-        "function": "sma",
+        "function": "renko",
         "params": {
-            "length": 11
-        }
-    },
-    {
-        "function": "rsi",
-        "params": {
-            "length": 10
-        }
-    },
-    {
-        "function": "rsi",
-        "params": {
-            "length": 9
-        }
-    },
-    {
-        "function": "rsi",
-        "params": {
-            "length": 8
+            "custom": True,
+            "brick_size": 1
         }
     },
 ]
@@ -39,8 +23,12 @@ STRATEGY_PARAMS = {
 if __name__ == '__main__':
     login_data = Login(CREDENTIALS).login()
     data_getter = DataGetter()
-    strategy = Strategy(STRATEGY_PARAMS)
-    module = strategy.validate_strategy_file()
-    strategy.module = module
-    program = Program(INDICATORS, data_getter, strategy)
-    program.run()
+    # strategy = Strategy(STRATEGY_PARAMS)
+    # module = strategy.validate_strategy_file()
+    # strategy.module = module
+    # program = Program(
+    #     INDICATORS, data_getter, strategy, max_candles=20
+    # )
+    # program.run_tick()
+    program = ProgramV2(data_getter).run_tick()
+
