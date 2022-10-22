@@ -5,23 +5,17 @@ from datetime import datetime
 from var import CONFIGURATION
 
 class DataGetter:
-    def __init__(self):
-        self.data = []
+    def __init__(self, max_candles, strategy_params):
+        self.max_candles = max_candles
+        self.strategy_params = strategy_params
+        self.data = None
+        self.get_initial_data()
 
-    def read_data(self, max_candles):
-        # timezone = pytz.timezone("Europe/Moscow")
-        timezone = pytz.timezone("Etc/UTC")
-        utc_from = datetime.now(tz=timezone)
-        # utc_from = datetime.now()
-        # print(utc_from)
-        rates = mt5.copy_rates_from(
-            "EURUSD", mt5.TIMEFRAME_M1, utc_from,
-            max_candles
-        )
-        rates_frame = pd.DataFrame(rates)
-        rates_frame['time']=pd.to_datetime(rates_frame['time'], unit='s')
-        return rates_frame
+    def get_initial_data(self):
+        self.data = pd.read_csv(f"data/{self.strategy_params['data_file']}")
 
-    def store_tick(self):
-        tick = mt5.symbol_info_tick(CONFIGURATION["market"])._asdict()
-        return tick
+    def read_data_file(self):
+        return
+    
+    def read_tick_file(self):
+        return

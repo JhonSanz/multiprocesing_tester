@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import concurrent.futures
 import pandas as pd
 from algorithm import AlgorithmSelector
-from strategy import Strategy
+from indicators import Strategy
 from get_data import DataGetter
 from var import CONFIGURATION, BASE_REQUEST
 from orders import Operation
