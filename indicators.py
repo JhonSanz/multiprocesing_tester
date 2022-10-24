@@ -9,16 +9,17 @@ class Indicators:
 
     def choose_algorithms(self):
         _copy = self.data.copy()
-        for parameter in self.indicators_params:
-            self.data = (
+        for index, parameter in enumerate(self.indicators_params):
+            params = {"length": self.config_value[index]}
+            _copy[f"{parameter['function']}_{params['length']}_{index}"] = (
                 self.select_algorithm(
                     _copy,
                     parameter["function"],
-                    {"length": self.config_value}
+                    params,
+                    index
                 )
             )
         return _copy
 
-    def select_algorithm(self, data, function, params):
-        getattr(data.ta, function)(**params, append=True)
-        return self.data
+    def select_algorithm(self, data, function, params, index):
+        return getattr(data.ta, function)(**params)

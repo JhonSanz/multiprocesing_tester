@@ -1,11 +1,20 @@
+from itertools import product
 import pandas as pd
 from main import run_strategy
 
 INDICATORS = [
     {
+        # high
         "function": "sma",
         "params": {
-            "length": [i for i in range(10, 11)]
+            "length": [10, 11] # [i for i in range(1, 5)]
+        }
+    },
+    {
+        # low
+        "function": "sma",
+        "params": {
+            "length": [12] # [i for i in range(5, 10)]
         }
     },
 ]
@@ -27,8 +36,9 @@ class Tester:
             df = pd.read_csv("results.csv")
         except FileNotFoundError:
             df = None
-        last_row =len(df.iloc[:]) if df is not None else 0
-        for item in self.indicators[0]["params"]["length"][last_row:]:
+        last_row = len(df.iloc[:]) if df is not None else 0
+        product_values = list(map(lambda x: x["params"]["length"], self.indicators))
+        for item in list(product(*product_values))[:]:
             data = run_strategy(item, self.indicators, self.strategy_params)
             if df is None:
                 df = pd.DataFrame({

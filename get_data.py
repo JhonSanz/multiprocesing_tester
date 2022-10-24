@@ -5,9 +5,7 @@ from datetime import datetime
 from var import CONFIGURATION
 
 class DataGetter:
-    def __init__(self, max_candles, indicators_params, strategy_params):
-        self.max_candles = max_candles
-        self.indicators_params = indicators_params
+    def __init__(self, strategy_params):
         self.strategy_params = strategy_params
         self.data = None
         self.get_initial_data()
