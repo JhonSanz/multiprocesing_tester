@@ -20,18 +20,18 @@ class TwoMeansStrategy(BaseStrategy):
     def run(self):
         high_label = self.get_column_names(self.high)
         low_label = self.get_column_names(self.low)
-        self.data.loc[:, "trend"] = None
-        self.data.loc[self.data["close"] >= self.data[f"{high_label}"], ["trend"]] = self.UP_TREND
-        self.data.loc[self.data["close"] <= self.data[f"{low_label}"], ["trend"]] = self.DOWN_TREND
-        self.data.to_csv("test_data_indicators.csv", index=False)
-        return
+        _data = self.data.copy()
+        _data.loc[:, "trend"] = 0
+        _data.loc[_data["close"] >= _data[f"{high_label}"], ["trend"]] = self.UP_TREND
+        _data.loc[_data["close"] <= _data[f"{low_label}"], ["trend"]] = self.DOWN_TREND
         for (
             date, close, sma_high, sma_low, trend
         ) in zip(
-            self.data["date"], self.data["close"],
-            self.data[r"SMA_[\d]+_0"],
-            self.data[r"SMA_[\d]+_1"],
-            self.data["trend"]
+            _data["date"], _data["close"], _data[f"{high_label}"],
+            _data[f"{low_label}"], _data["trend"]
         ):
             if (close < sma_low and trend == self.UP_TREND):
-                pass
+                self.open_operation(close, date, self.SELL)
+            if (close > sma_high and trend == self.DOWN_TREND):
+                self.open_operation(close, date, self.SELL)
+
