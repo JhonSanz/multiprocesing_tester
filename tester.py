@@ -50,6 +50,6 @@ class Tester:
                 })
             else:
                 df.loc[len(df)] = {"profit": data}
-            df.to_csv("results.csv", index=False)
+            # df.to_csv("results.csv", index=False)
 
 Tester(INDICATORS, STRATEGY_PARAMS).run()

@@ -10,6 +10,6 @@ def run_strategy(config_value, indicators_params, strategy_params):
         indicators_params,
         data_getter.data
     ).choose_algorithms()
-    data_indicators.to_csv("test_data_indicators.csv", index=False)
-    # program = TwoMeansStrategy(data_indicators).run()
+    # data_indicators.to_csv("test_data_indicators.csv", index=False)
+    program = TwoMeansStrategy(data_indicators).run()
     return 592
