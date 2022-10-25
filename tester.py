@@ -4,17 +4,21 @@ from main import run_strategy
 
 INDICATORS = [
     {
-        # high
         "function": "sma",
         "params": {
             "length": [10, 11] # [i for i in range(1, 5)]
+        }, 
+        "config_params": {
+            "close": "high"
         }
     },
     {
-        # low
         "function": "sma",
         "params": {
             "length": [12] # [i for i in range(5, 10)]
+        }, 
+        "config_params": {
+            "close": "low"
         }
     },
 ]
