@@ -5,7 +5,7 @@ class TwoMeansStrategy(BaseStrategy):
     UP_TREND = 1
     DOWN_TREND = -1
     RANGE = 0
-    STOP = 200
+    STOP = 20
 
     def __init__(self, data):
         super().__init__()
@@ -82,4 +82,4 @@ class TwoMeansStrategy(BaseStrategy):
                 trend != 0
             ):
                 trend_was = trend
-        self.save_orders(f"{self.high_label}_{self.low_label}")
+        return self.save_orders(f"{self.high_label}_{self.low_label}")
