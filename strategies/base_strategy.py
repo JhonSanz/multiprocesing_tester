@@ -10,21 +10,28 @@ class BaseStrategy:
         self.orders = []
     
     def open_operation(self, price, date, type, stop_loss=None):
+        # print("open position")
         self.orders.append({
             "price_open": price, "date_open": date, "type": type,
             "date_close": None, "price_close": None, "direction": self._IN,
             "stop_loss": stop_loss, "comment": ""
         })
-        return len(self.orders)
+        return len(self.orders) - 1
 
     def close_operation(self, date_opened, date_close, price_close, comment=""):
+        # print("close position")
+        # if comment != "":
+        #     print("Stop loss")
         position = list(filter(
             lambda x: (
                 x["date_open"] == date_opened and
                 x["date_close"] is None and
                 x["price_close"] is None
             ), self.orders
-        ))[0]
+        ))
+        if len(position) == 0:
+            return
+        position = position[0]
         item_pos = self.orders.index(position)
         position = {
             **position, "date_close": date_close,

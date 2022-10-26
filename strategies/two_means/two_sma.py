@@ -5,6 +5,7 @@ class TwoMeansStrategy(BaseStrategy):
     UP_TREND = 1
     DOWN_TREND = -1
     RANGE = 0
+    STOP = 20
 
     def __init__(self, data):
         super().__init__()
@@ -29,6 +30,7 @@ class TwoMeansStrategy(BaseStrategy):
         _data.loc[_data["close"] <= _data[f"{self.low_label}"], ["trend"]] = self.DOWN_TREND
 
         opened_position = False
+        trend_was = None
         ticket = 0
         for (
             date, close, sma_high, sma_low, trend
@@ -36,12 +38,16 @@ class TwoMeansStrategy(BaseStrategy):
             _data["date"], _data["close"], _data[f"{self.high_label}"],
             _data[f"{self.low_label}"], _data["trend"]
         ):
+            if (trend != 0 and trend_was is None):
+                trend_was = trend
+            if (trend_was is None):
+                continue
             if not opened_position:
-                if (close < sma_low and trend == self.UP_TREND):
-                    ticket = self.open_operation(close, date, self.SELL)
+                if (close < sma_low and trend_was == self.UP_TREND):
+                    ticket = self.open_operation(close, date, self.SELL, close + self.STOP)
                     opened_position = True
-                if (close > sma_high and trend == self.DOWN_TREND):
-                    ticket = self.open_operation(close, date, self.SELL)
+                if (close > sma_high and trend_was == self.DOWN_TREND):
+                    ticket = self.open_operation(close, date, self.BUY, close - self.STOP)
                     opened_position = True
             else:
                 self.validate_stop_losses(date, close)
@@ -49,13 +55,20 @@ class TwoMeansStrategy(BaseStrategy):
                 if (
                     (
                         pos_info["type"] == self.SELL
-                        and trend == self.DOWN_TREND
+                        and trend_was == self.DOWN_TREND
                         and close > sma_low
                     ) or (
                         pos_info["type"] == self.BUY
-                        and trend == self.UP_TREND
+                        and trend_was == self.UP_TREND
                         and close < sma_high
                     )
                 ):
                     self.close_operation(pos_info["date_open"], date, close)
+                    opened_position = False
+            if (
+                trend_was is not None and
+                trend_was != 0 and
+                trend != 0
+            ):
+                trend_was = trend
         self.save_orders(f"{self.high_label}_{self.low_label}")
