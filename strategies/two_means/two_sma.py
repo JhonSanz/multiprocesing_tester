@@ -5,7 +5,7 @@ class TwoMeansStrategy(BaseStrategy):
     UP_TREND = 1
     DOWN_TREND = -1
     RANGE = 0
-    STOP = 20
+    STOP = 200
 
     def __init__(self, data):
         super().__init__()
@@ -57,9 +57,11 @@ class TwoMeansStrategy(BaseStrategy):
                         pos_info["type"] == self.SELL
                         and trend_was == self.DOWN_TREND
                         and close > sma_low
+                        and close > sma_high
                     ) or (
                         pos_info["type"] == self.BUY
                         and trend_was == self.UP_TREND
+                        and close < sma_low
                         and close < sma_high
                     )
                 ):

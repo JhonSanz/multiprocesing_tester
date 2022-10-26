@@ -48,15 +48,15 @@ class BaseStrategy:
                 x["stop_loss"] is not None and
                 x["price_close"] is None and
                 x["date_close"] is None and (
-                    x["stop_loss"] <= current_price if x["type"] == self.BUY else
-                    x["stop_loss"] >= current_price
+                    x["stop_loss"] >= current_price if x["type"] == self.BUY else
+                    x["stop_loss"] <= current_price
                 )
             ), self.orders
         ))
         for operation in orders:
             self.close_operation(
                 operation["date_open"], current_date, current_price,
-                f"Stop loss at {current_price}"
+                f"Stop loss at {operation['stop_loss']}"
             )
 
     def get_position_by_ticket(self, ticket):
@@ -64,4 +64,5 @@ class BaseStrategy:
 
     def save_orders(self, filename):
         df = pd.DataFrame(data=self.orders)
+        df = df.drop("direction", axis=1)
         df.to_csv(f"orders/{filename}_orders.csv")
