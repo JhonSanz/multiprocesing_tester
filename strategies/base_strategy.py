@@ -41,21 +41,26 @@ class BaseStrategy:
         }
         self.orders[item_pos] = position
     
-    def validate_stop_losses(self, current_date, current_price):
+    def stop_reasons(self, position, high, low):
+        return (
+            position["stop_loss"] >= low if position["type"] == self.BUY else
+            position["stop_loss"] <= high
+        )
+
+    def validate_stop_losses(self, current_date, high, low):
         orders = list(filter(
             lambda x: (
                 x["direction"] == self._IN and
                 x["stop_loss"] is not None and
                 x["price_close"] is None and
-                x["date_close"] is None and (
-                    x["stop_loss"] >= current_price if x["type"] == self.BUY else
-                    x["stop_loss"] <= current_price
-                )
+                x["date_close"] is None and
+                self.stop_reasons(x, high, low)
             ), self.orders
         ))
         for operation in orders:
             self.close_operation(
-                operation["date_open"], current_date, current_price,
+                operation["date_open"], current_date, 
+                operation['stop_loss'],
                 f"Stop loss at {operation['stop_loss']}"
             )
 
