@@ -1,5 +1,4 @@
 import pytz
-import MetaTrader5 as mt5
 import pandas as pd
 from datetime import datetime
 from var import CONFIGURATION
