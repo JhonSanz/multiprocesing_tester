@@ -6,7 +6,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [3920] # [i for i in range(1, 5)]
+            "length": [i for i in range(3000, 4001)]
         }, 
         "config_params": {
             "close": "high"
@@ -15,7 +15,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [3920] # [i for i in range(5, 10)]
+            "length": [i for i in range(3000, 4001)]
         }, 
         "config_params": {
             "close": "low"
@@ -42,7 +42,14 @@ class Tester:
             df = None
         last_row = len(df.iloc[:]) if df is not None else 0
         product_values = list(map(lambda x: x["params"]["length"], self.indicators))
-        for item in list(product(*product_values))[last_row:]:
+
+        """     Define the combination of your indicators' values.      """
+        """------------------------------------------------------------ """
+        # _product = list(product(*product_values))
+        _one_to_one = list(zip(product_values[0], product_values[1]))
+        """------------------------------------------------------------ """
+
+        for item in _one_to_one[last_row:]:
             data = run_strategy(item, self.indicators, self.strategy_params)
             if df is None:
                 df = pd.DataFrame({
