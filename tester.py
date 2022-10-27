@@ -6,7 +6,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(3000, 4001)]
+            "length": [i for i in range(20, 100)]
         }, 
         "config_params": {
             "close": "high"
@@ -15,7 +15,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(3000, 4001)]
+            "length": [i for i in range(20, 100)]
         }, 
         "config_params": {
             "close": "low"
@@ -26,7 +26,7 @@ INDICATORS = [
 STRATEGY_PARAMS = {
     "file": "strategies.two_means.two_sma",
     "params": {
-        "data_file": "us100/US100Cash_M1_202001020905_202210192359.csv"
+        "data_file": "us100/M10.csv"
     }
 }
 

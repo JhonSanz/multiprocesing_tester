@@ -1,5 +1,6 @@
 import re
 from strategies.base_strategy import BaseStrategy
+from datetime import datetime
 
 class TwoMeansStrategy(BaseStrategy):
     UP_TREND = 1
@@ -39,6 +40,18 @@ class TwoMeansStrategy(BaseStrategy):
             _data[f"{self.high_label}"], _data[f"{self.low_label}"],
             _data["trend"]
         ):
+            if (
+                (datetime.strptime("21:59", "%H:%M").time() <=
+                 date.time()
+                 <= datetime.strptime("23:59", "%H:%M").time()
+                )
+                or
+                (datetime.strptime("00:00", "%H:%M").time() <=
+                 date.time()
+                 <= datetime.strptime("02:59", "%H:%M").time()
+                )
+            ):
+                continue
             if (trend != 0 and trend_was is None):
                 trend_was = trend
             if (trend_was is None):
