@@ -1,7 +1,6 @@
 import pytz
 import pandas as pd
 from datetime import datetime
-from var import CONFIGURATION
 
 class DataGetter:
     def __init__(self, strategy_params):
