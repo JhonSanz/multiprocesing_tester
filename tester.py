@@ -6,7 +6,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(20, 100)]
+            "length": [i for i in range(500, 501)]
         }, 
         "config_params": {
             "close": "high"
@@ -15,7 +15,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(20, 100)]
+            "length": [i for i in range(500, 501)]
         }, 
         "config_params": {
             "close": "low"

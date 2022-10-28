@@ -6,7 +6,7 @@ class TwoMeansStrategy(BaseStrategy):
     UP_TREND = 1
     DOWN_TREND = -1
     RANGE = 0
-    STOP = 20
+    STOP = 200
 
     def __init__(self, data):
         super().__init__()
@@ -26,36 +26,36 @@ class TwoMeansStrategy(BaseStrategy):
         self.high_label = self.get_column_names("sma_[\d]+_0")
         self.low_label = self.get_column_names("sma_[\d]+_1")
         _data = self.data.copy()
-        _data.loc[:, "trend"] = 0
-        _data.loc[_data["close"] >= _data[f"{self.high_label}"], ["trend"]] = self.UP_TREND
-        _data.loc[_data["close"] <= _data[f"{self.low_label}"], ["trend"]] = self.DOWN_TREND
+        # _data.loc[:, "trend"] = 0
+        # _data.loc[_data["close"] >= _data[f"{self.high_label}"], ["trend"]] = self.UP_TREND
+        # _data.loc[_data["close"] <= _data[f"{self.low_label}"], ["trend"]] = self.DOWN_TREND
+
+        _data.to_csv("test_data_indicators.csv", index=False)
 
         opened_position = False
-        trend_was = None
         ticket = 0
+        limit_low = None
+        limit_high = None
+
         for (
-            date, close, high, low, sma_high, sma_low, trend
+            date, close, high, low, sma_high, sma_low, spread
         ) in zip(
             _data["date"], _data["close"],  _data["high"],  _data["low"],
-            _data[f"{self.high_label}"], _data[f"{self.low_label}"],
-            _data["trend"]
+            _data[f"{self.high_label}"], _data[f"{self.low_label}"], _data["spread"]
         ):
-            if (
-                (datetime.strptime("21:59", "%H:%M").time() <=
-                 date.time()
-                 <= datetime.strptime("23:59", "%H:%M").time()
-                )
-                or
-                (datetime.strptime("00:00", "%H:%M").time() <=
-                 date.time()
-                 <= datetime.strptime("02:59", "%H:%M").time()
-                )
-            ):
-                continue
-            if (trend != 0 and trend_was is None):
-                trend_was = trend
-            if (trend_was is None):
-                continue
+            # if (
+            #     (datetime.strptime("21:59", "%H:%M").time() <=
+            #      date.time()
+            #      <= datetime.strptime("23:59", "%H:%M").time()
+            #     )
+            #     or
+            #     (datetime.strptime("00:00", "%H:%M").time() <=
+            #      date.time()
+            #      <= datetime.strptime("02:59", "%H:%M").time()
+            #     )
+            # ):
+            #     continue
+
             self.validate_stop_losses(date, high, low)
 
             if opened_position:
@@ -63,7 +63,7 @@ class TwoMeansStrategy(BaseStrategy):
                 if (
                     (
                         pos_info["type"] == self.SELL
-                        and trend_was == self.DOWN_TREND
+                        and limit_low
                         and close > sma_low
                         and close > sma_high
                     )
@@ -73,7 +73,7 @@ class TwoMeansStrategy(BaseStrategy):
                 if (
                     (
                         pos_info["type"] == self.BUY
-                        and trend_was == self.UP_TREND
+                        and limit_high
                         and close < sma_low
                         and close < sma_high
                     )
@@ -82,17 +82,28 @@ class TwoMeansStrategy(BaseStrategy):
                     opened_position = False
             
             if not opened_position:
-                if (high < sma_low and trend_was == self.UP_TREND):
-                    ticket = self.open_operation(close, date, self.SELL, close + self.STOP)
+                if (high < sma_low and limit_high and spread <= 100):
+                    insurance = 0
+                    if (sma_high - close > self.STOP):
+                        insurance = close + self.STOP
+                    else:
+                        insurance = sma_high
+                    ticket = self.open_operation(close, date, self.SELL, insurance)
                     opened_position = True
-                if (low > sma_high and trend_was == self.DOWN_TREND):
-                    ticket = self.open_operation(close, date, self.BUY, close - self.STOP)
+                    limit_high = False
+                if (low > sma_high and limit_low and spread <= 100):
+                    insurance = 0
+                    if (close - sma_low > self.STOP):
+                        insurance = close - self.STOP
+                    else:
+                        insurance = sma_low
+                    ticket = self.open_operation(close, date, self.BUY, insurance)
                     opened_position = True
+                    limit_low = False
 
-            if (
-                trend_was is not None and
-                trend_was != 0 and
-                trend != 0
-            ):
-                trend_was = trend
+            if (close < sma_low):
+                limit_low = True
+            elif (close > sma_high):
+                limit_high = True
+
         return self.save_orders(f"{self.high_label}_{self.low_label}")

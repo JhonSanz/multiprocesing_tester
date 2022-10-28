@@ -17,8 +17,9 @@ class DataGetter:
             "<HIGH>": "high",
             "<LOW>": "low",
             "<CLOSE>": "close",
+            "<SPREAD>": "spread"
         }, inplace=True)
-        self.data = self.data[['date', 'open', 'high', 'low', 'close']]
+        self.data = self.data[['date', 'open', 'high', 'low', 'close', 'spread']]
         self.data.reset_index(drop=True, inplace=True)
         self.data.reset_index(inplace=True)
         self.data['date'] = pd.to_datetime(self.data['date'], format='%Y.%m.%d')
