@@ -82,10 +82,10 @@ class TwoMeansStrategy(BaseStrategy):
                     opened_position = False
             
             if not opened_position:
-                if (close < sma_low and trend_was == self.UP_TREND):
+                if (high < sma_low and trend_was == self.UP_TREND):
                     ticket = self.open_operation(close, date, self.SELL, close + self.STOP)
                     opened_position = True
-                if (close > sma_high and trend_was == self.DOWN_TREND):
+                if (low > sma_high and trend_was == self.DOWN_TREND):
                     ticket = self.open_operation(close, date, self.BUY, close - self.STOP)
                     opened_position = True
 

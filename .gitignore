@@ -1,2 +1,6 @@
 desktop.ini
 *.pyc
+/orders
+/totals
+results.csv
+settings.json
