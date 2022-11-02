@@ -6,7 +6,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(500, 501)]
+            "length": [i for i in range(2, 500)]
         }, 
         "config_params": {
             "close": "high"
@@ -15,7 +15,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(500, 501)]
+            "length": [i for i in range(2, 500)]
         }, 
         "config_params": {
             "close": "low"
@@ -26,7 +26,8 @@ INDICATORS = [
 STRATEGY_PARAMS = {
     "file": "strategies.two_means.two_sma",
     "params": {
-        "data_file": "us100/M10.csv"
+        "data_file": "us100/NAS100_M10_201701030100_202209292350.csv",
+        "decimals": 10**-(1)
     }
 }
 
