@@ -6,7 +6,8 @@ class TwoMeansStrategy(BaseStrategy):
     UP_TREND = 1
     DOWN_TREND = -1
     RANGE = 0
-    STOP = 200
+    STOP = 20
+    SPREAD = 10
 
     def __init__(self, data):
         super().__init__()
@@ -30,7 +31,7 @@ class TwoMeansStrategy(BaseStrategy):
         # _data.loc[_data["close"] >= _data[f"{self.high_label}"], ["trend"]] = self.UP_TREND
         # _data.loc[_data["close"] <= _data[f"{self.low_label}"], ["trend"]] = self.DOWN_TREND
 
-        _data.to_csv("test_data_indicators.csv", index=False)
+        # _data.to_csv("test_data_indicators.csv", index=False)
 
         opened_position = False
         ticket = 0
@@ -82,7 +83,7 @@ class TwoMeansStrategy(BaseStrategy):
                     opened_position = False
             
             if not opened_position:
-                if (high < sma_low and limit_high and spread <= 100):
+                if (high < sma_low and limit_high and spread <= self.SPREAD):
                     insurance = 0
                     if (sma_high - close > self.STOP):
                         insurance = close + self.STOP
@@ -91,7 +92,7 @@ class TwoMeansStrategy(BaseStrategy):
                     ticket = self.open_operation(close, date, self.SELL, insurance)
                     opened_position = True
                     limit_high = False
-                if (low > sma_high and limit_low and spread <= 100):
+                if (low > sma_high and limit_low and spread <= self.SPREAD):
                     insurance = 0
                     if (close - sma_low > self.STOP):
                         insurance = close - self.STOP
