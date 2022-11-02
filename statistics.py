@@ -1,11 +1,13 @@
+from pips import Pips
 
 class Statistics:
     BUY = 0
     SELL = 1
 
-    def __init__(self, data, indicators):
+    def __init__(self, data, indicators, pips_calculator):
         self.data = data
         self.indicators = indicators
+        self.pips_calculator = pips_calculator
 
     def run(self):
         orders = self.data.copy()
@@ -15,5 +17,6 @@ class Statistics:
             'date_open', 'price_open', 'date_close',
             'price_close', 'type', 'total',
         ]]
-        # orders.to_csv(f"totals/{'_'.join(map(str, self.indicators))}_totals.csv")
+        orders["total"] = orders["total"].apply(lambda x: self.pips_calculator.profit(x))
+        orders.to_csv(f"totals/{'_'.join(map(str, self.indicators))}_totals.csv")
         return orders

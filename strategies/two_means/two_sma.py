@@ -7,12 +7,12 @@ class TwoMeansStrategy(BaseStrategy):
     DOWN_TREND = -1
     RANGE = 0
     STOP = 20
-    SPREAD = 10
+    SPREAD = 1
 
     def __init__(self, data, decimals):
         super().__init__()
         self.data = data
-        self.decimals = decimals
+        self.decimals = 10**(-decimals)
         self.high_label = ""
         self.low_label = ""
 

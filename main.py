@@ -3,6 +3,7 @@ from indicators import Indicators
 from strategies.two_means.two_sma import TwoMeansStrategy
 from statistics import Statistics
 from termcolor import colored
+from pips import Pips
 
 def run_strategy(config_value, indicators_params, strategy_params):
     print(colored(f"Preparando data para {'_'.join(map(str, config_value))}", "green"))
@@ -20,5 +21,10 @@ def run_strategy(config_value, indicators_params, strategy_params):
         strategy_params["params"]["decimals"]
     ).run()
     orders.dropna(inplace=True)
-    result = Statistics(orders, config_value).run()
+    pips_calculatior = Pips(
+        strategy_params["params"]["decimals"],
+        strategy_params["params"]["volume"],
+        strategy_params["params"]["contract_size"],
+    )
+    result = Statistics(orders, config_value, pips_calculatior).run()
     return result["total"].sum()
