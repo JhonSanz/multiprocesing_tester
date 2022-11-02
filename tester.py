@@ -26,7 +26,8 @@ INDICATORS = [
 STRATEGY_PARAMS = {
     "file": "strategies.two_means.two_sma",
     "params": {
-        "data_file": "us100/NAS100_M10_201701030100_202209292350.csv"
+        "data_file": "us100/NAS100_M10_201701030100_202209292350.csv",
+        "decimals": 10**-(1)
     }
 }
 
