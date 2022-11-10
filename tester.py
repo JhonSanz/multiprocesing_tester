@@ -26,11 +26,11 @@ INDICATORS = [
 STRATEGY_PARAMS = {
     "file": "strategies.two_means.two_sma",
     "params": {
-        "data_file": "eurusd/EURUSD_M10_201701020100_202209300000.csv",
-        "decimals": 5,
+        "data_file": "us100/NAS100_M10_201707030100_202209292350.csv",
+        "decimals": 1,
         "deposit": 10000,
         "volume": 0.1,
-        "contract_size": 100000
+        "contract_size": 1
     }
 }
 

@@ -9,10 +9,17 @@ class BaseStrategy:
     def __init__(self):
         self.orders = []
     
-    def open_operation(self, price, date, type, stop_loss=None):
-        # print("open position")
+    def open_operation(self, price, date, type, spread, stop_loss=None):
+        real_price = 0
+        if (type == self.BUY):
+            # Opens position in ask
+            real_price = price + spread
+        elif (type == self.SELL):
+            # Opens position in bid
+            real_price = price
+
         self.orders.append({
-            "price_open": price, "date_open": date, "type": type,
+            "price_open": real_price, "date_open": date, "type": type,
             "date_close": None, "price_close": None, "direction": self._IN,
             "stop_loss": stop_loss, "comment": ""
         })
@@ -41,20 +48,21 @@ class BaseStrategy:
         }
         self.orders[item_pos] = position
     
-    def stop_reasons(self, position, high, low):
+    def stop_reasons(self, position, high, low, spread):
         return (
-            position["stop_loss"] >= low if position["type"] == self.BUY else
-            position["stop_loss"] <= high
+            position["stop_loss"] >= low
+            if position["type"] == self.BUY else
+            position["stop_loss"] <= high + spread
         )
 
-    def validate_stop_losses(self, current_date, high, low):
+    def validate_stop_losses(self, current_date, high, low, spread):
         orders = list(filter(
             lambda x: (
                 x["direction"] == self._IN and
                 x["stop_loss"] is not None and
                 x["price_close"] is None and
                 x["date_close"] is None and
-                self.stop_reasons(x, high, low)
+                self.stop_reasons(x, high, low, spread)
             ), self.orders
         ))
         for operation in orders:

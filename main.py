@@ -27,4 +27,4 @@ def run_strategy(config_value, indicators_params, strategy_params):
         strategy_params["params"]["contract_size"],
     )
     result = Statistics(orders, config_value, pips_calculatior).run()
-    return result["total"].sum()
+    return result["total"].sum() + strategy_params["params"]["deposit"]

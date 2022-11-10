@@ -6,8 +6,8 @@ class TwoMeansStrategy(BaseStrategy):
     UP_TREND = 1
     DOWN_TREND = -1
     RANGE = 0
-    STOP = 20
-    SPREAD = 1
+    STOP = 500
+    SPREAD = 10
 
     def __init__(self, data, decimals):
         super().__init__()
@@ -45,21 +45,16 @@ class TwoMeansStrategy(BaseStrategy):
             _data["date"], _data["close"],  _data["high"],  _data["low"],
             _data[f"{self.high_label}"], _data[f"{self.low_label}"], _data["spread"]
         ):
-            # if (
-            #     (datetime.strptime("21:59", "%H:%M").time() <=
-            #      date.time()
-            #      <= datetime.strptime("23:59", "%H:%M").time()
-            #     )
-            #     or
-            #     (datetime.strptime("00:00", "%H:%M").time() <=
-            #      date.time()
-            #      <= datetime.strptime("02:59", "%H:%M").time()
-            #     )
-            # ):
-            #     continue
-
-            self.validate_stop_losses(date, high, low)
-
+            spread = spread * self.decimals
+            self.validate_stop_losses(date, high, low, spread)
+            if (
+                not (
+                    date.time() >= datetime.strptime("01:59", "%H:%M").time()
+                    and
+                    date.time() <= datetime.strptime("22:59", "%H:%M").time()
+                )
+            ):
+                continue
             if opened_position:
                 pos_info = self.get_position_by_ticket(ticket)
                 if (
@@ -86,20 +81,22 @@ class TwoMeansStrategy(BaseStrategy):
             if not opened_position:
                 if (high < sma_low and limit_high and spread <= self.SPREAD):
                     insurance = 0
-                    if (sma_high - close > (self.STOP * self.decimals)):
-                        insurance = close + (self.STOP * self.decimals)
-                    else:
-                        insurance = sma_high
-                    ticket = self.open_operation(close, date, self.SELL, insurance)
+                    # if (sma_high - close > (self.STOP * self.decimals)):
+                    #     insurance = close + (self.STOP * self.decimals)
+                    # else:
+                    #     insurance = sma_high
+                    insurance = close + (self.STOP * self.decimals)
+                    ticket = self.open_operation(close, date, self.SELL, spread, insurance)
                     opened_position = True
                     limit_high = False
                 if (low > sma_high and limit_low and spread <= self.SPREAD):
                     insurance = 0
-                    if (close - sma_low > (self.STOP * self.decimals)):
-                        insurance = close - (self.STOP * self.decimals)
-                    else:
-                        insurance = sma_low
-                    ticket = self.open_operation(close, date, self.BUY, insurance)
+                    # if (close - sma_low > (self.STOP * self.decimals)):
+                    #     insurance = close - (self.STOP * self.decimals)
+                    # else:
+                    #     insurance = sma_low
+                    insurance = close - (self.STOP * self.decimals)
+                    ticket = self.open_operation(close, date, self.BUY, spread, insurance)
                     opened_position = True
                     limit_low = False
 
