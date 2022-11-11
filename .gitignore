@@ -2,6 +2,7 @@ desktop.ini
 *.pyc
 /orders
 /totals
+results_*.csv
 results.csv
 settings.json
 /env
