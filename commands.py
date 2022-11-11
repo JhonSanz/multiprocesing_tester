@@ -1,4 +1,4 @@
-import os
+import os, glob
 from shutil import rmtree
 import argparse
 from termcolor import colored
@@ -32,7 +32,8 @@ def reset_orders():
 
 def reset_results():
     try:
-        os.remove("results.csv")
+        for f in glob.glob("results_core*.csv"):
+            os.remove(f)
         print(colored("Results file deleted", "green"))
     except FileNotFoundError:
         pass

@@ -26,7 +26,7 @@ INDICATORS = [
     },
 ]
 
-CORES = cpu_count()
+CORES = 4 # cpu_count()
 
 STRATEGY_PARAMS = {
     "file": "strategies.two_means.two_sma",
@@ -62,6 +62,7 @@ class Tester:
                 df.loc[len(df)] = {"profit": data, "params": '_'.join(map(str, item))}
             df.to_csv(f"results_core{core}.csv", index=False)
 
+
 if __name__ == '__main__':
     product_values = list(map(lambda x: x["params"]["length"], INDICATORS))
     """------------------------------------------------------------ """
@@ -72,7 +73,11 @@ if __name__ == '__main__':
     """------------------------------------------------------------ """
     splitted = np.array_split(_one_to_one, CORES)
     with ProcessPoolExecutor(max_workers=CORES) as executor:
-        executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run(1, splitted[0]))
-        executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run(2, splitted[1]))
-        executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run(3, splitted[2]))
-        executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run(4, splitted[3]))
+        core1 = executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run, 1, splitted[0])
+        core2 = executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run, 2, splitted[1])
+        core3 = executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run, 3, splitted[2])
+        core4 = executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run, 4, splitted[3])
+        core1.result()
+        core2.result()
+        core3.result()
+        core4.result()
