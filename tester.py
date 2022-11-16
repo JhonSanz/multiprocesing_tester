@@ -1,15 +1,16 @@
 from itertools import product
 import pandas as pd
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from multiprocessing import cpu_count
 from main import run_strategy
 import numpy as np
+from strategies.configs import US100_PARAMS, EURUSD_PARAMS
 
 INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(500, 1001)]
+            "length": [i for i in range(405, 406)]
         }, 
         "config_params": {
             "close": "high"
@@ -18,7 +19,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(500, 1001)]
+            "length": [i for i in range(405, 406)]
         }, 
         "config_params": {
             "close": "low"
@@ -26,16 +27,13 @@ INDICATORS = [
     },
 ]
 
-CORES = 4 # cpu_count()
+CORES = cpu_count()
 
 STRATEGY_PARAMS = {
     "file": "strategies.two_means.two_sma",
     "params": {
         "data_file": "us100/NAS100_M10_201707030100_202209292350.csv",
-        "decimals": 1,
-        "deposit": 10000,
-        "volume": 0.1,
-        "contract_size": 1
+        **US100_PARAMS
     }
 }
 
@@ -73,11 +71,10 @@ if __name__ == '__main__':
     """------------------------------------------------------------ """
     splitted = np.array_split(_one_to_one, CORES)
     with ProcessPoolExecutor(max_workers=CORES) as executor:
-        core1 = executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run, 1, splitted[0])
-        core2 = executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run, 2, splitted[1])
-        core3 = executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run, 3, splitted[2])
-        core4 = executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run, 4, splitted[3])
-        core1.result()
-        core2.result()
-        core3.result()
-        core4.result()
+        proccessor = [
+            executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run, index, fragment)
+            for index, fragment in enumerate(splitted)
+            if len(fragment) > 0
+        ]
+        for future in proccessor:
+            future.result()

@@ -15,6 +15,7 @@ class TwoMeansStrategy(BaseStrategy):
         self.decimals = 10**(-decimals)
         self.high_label = ""
         self.low_label = ""
+        self.SPREAD *= self.decimals
 
     def get_column_names(self, pattern):
         columns = self.data.columns
