@@ -1,4 +1,5 @@
 import pandas as pd
+from strategies.utils import InvalidStopException
 
 class BaseStrategy:
     BUY = 0
@@ -8,7 +9,7 @@ class BaseStrategy:
 
     def __init__(self):
         self.orders = []
-    
+
     def open_operation(self, price, date, type, spread, stop_loss=None):
         real_price = 0
         if (type == self.BUY):
@@ -21,14 +22,11 @@ class BaseStrategy:
         self.orders.append({
             "price_open": real_price, "date_open": date, "type": type,
             "date_close": None, "price_close": None, "direction": self._IN,
-            "stop_loss": stop_loss, "comment": ""
+            "stop_loss": stop_loss, "take_profit": None, "comment": ""
         })
         return len(self.orders) - 1
 
     def close_operation(self, date_opened, date_close, price_close, comment=""):
-        # print("close position")
-        # if comment != "":
-        #     print("Stop loss")
         position = list(filter(
             lambda x: (
                 x["date_open"] == date_opened and
@@ -47,7 +45,7 @@ class BaseStrategy:
             "comment": comment
         }
         self.orders[item_pos] = position
-    
+
     def stop_reasons(self, position, high, low, spread):
         return (
             position["stop_loss"] >= low
@@ -67,7 +65,7 @@ class BaseStrategy:
         ))
         for operation in orders:
             self.close_operation(
-                operation["date_open"], current_date, 
+                operation["date_open"], current_date,
                 operation['stop_loss'],
                 f"Stop loss at {operation['stop_loss']}"
             )
@@ -80,3 +78,30 @@ class BaseStrategy:
         df = df.drop("direction", axis=1)
         df.to_csv(f"orders/{filename}_orders.csv")
         return df
+
+    def edit_position(self, current_price, spread, position, option, value):
+        options = ["stop_loss", "take_profit"]
+        if not option in options:
+            raise Exception(f"""
+                {option} is not valid a valid option.
+                Possible values are: {options}
+            """)
+        if option == "stop_loss":
+            try:
+                self.validate_invalid_stop(
+                    current_price, value,
+                    position["type"], spread
+                )
+            except InvalidStopException:
+                raise InvalidStopException(value, current_price)
+        item_pos = self.orders.index(position)
+        position[option] = value
+        self.orders[item_pos] = position
+
+    def validate_invalid_stop(self, close, stop_price, type_operation, spread):
+        if (
+            (type_operation == self.BUY and stop_price < close)
+            or
+            (type_operation == self.SELL and stop_price > (close + spread))
+        ):
+            raise InvalidStopException(stop_price, close)

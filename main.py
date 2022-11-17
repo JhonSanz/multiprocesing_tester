@@ -1,6 +1,7 @@
 from get_data import DataGetter
 from indicators import Indicators
 from strategies.two_means.two_sma import TwoMeansStrategy
+from strategies.two_means.dynamic_stop import TwoMeansDynamicStopStrategy
 from statistics import Statistics
 from termcolor import colored
 from pips import Pips
@@ -16,7 +17,7 @@ def run_strategy(config_value, indicators_params, strategy_params):
     ).choose_algorithms()
     print("Spreads", sorted(data_indicators["spread"].unique()))
     print(colored("Calculando estrategia", "yellow"))
-    orders = TwoMeansStrategy(
+    orders = TwoMeansDynamicStopStrategy(
         data_indicators,
         strategy_params["params"]["decimals"]
     ).run()
