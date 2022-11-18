@@ -2,12 +2,12 @@ import re
 from strategies.base_strategy import BaseStrategy
 from datetime import datetime
 
-class TwoMeansStrategy(BaseStrategy):
+class Strategy(BaseStrategy):
     UP_TREND = 1
     DOWN_TREND = -1
     RANGE = 0
     STOP = 500
-    SPREAD = 10
+    SPREAD = 10000000
 
     def __init__(self, data, decimals):
         super().__init__()

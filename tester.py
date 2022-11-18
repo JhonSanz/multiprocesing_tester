@@ -10,7 +10,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(405, 406)]
+            "length": [i for i in range(715, 716)]
         }, 
         "config_params": {
             "close": "high"
@@ -19,7 +19,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(405, 406)]
+            "length": [i for i in range(715, 716)]
         }, 
         "config_params": {
             "close": "low"
@@ -30,10 +30,10 @@ INDICATORS = [
 CORES = cpu_count()
 
 STRATEGY_PARAMS = {
-    "file": "strategies.two_means.two_sma",
+    "file": "two_means.dynamic_stop",
     "params": {
-        "data_file": "us100/NAS100_M10_201707030100_202209292350.csv",
-        **US100_PARAMS
+        "data_file": "eurusd/EURUSD_M10_201707010000_202209300000.csv",
+        **EURUSD_PARAMS
     }
 }
 

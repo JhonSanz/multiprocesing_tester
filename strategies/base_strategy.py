@@ -22,7 +22,7 @@ class BaseStrategy:
         self.orders.append({
             "price_open": real_price, "date_open": date, "type": type,
             "date_close": None, "price_close": None, "direction": self._IN,
-            "stop_loss": stop_loss, "take_profit": None, "comment": ""
+            "stop_loss": stop_loss, "comment": ""
         })
         return len(self.orders) - 1
 

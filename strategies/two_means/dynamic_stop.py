@@ -3,7 +3,7 @@ from strategies.base_strategy import BaseStrategy
 from datetime import datetime
 from strategies.utils import InvalidStopException
 
-class TwoMeansDynamicStopStrategy(BaseStrategy):
+class Strategy(BaseStrategy):
     UP_TREND = 1
     DOWN_TREND = -1
     RANGE = 0
