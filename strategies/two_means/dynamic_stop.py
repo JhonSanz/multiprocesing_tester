@@ -38,17 +38,12 @@ class Strategy(BaseStrategy):
             pass
     
     def validate_higher_close(self, close, sma_high, sma_low):
-        return (
+        condition = (
             (close < sma_low and self.higher_close > close)
             or
             (close > sma_high and self.higher_close < close)
         )
-
-    def update_higher_close(self, close, sma_high, sma_low):
-        if (self.higher_close is None):
-            self.higher_close = close
-        if self.validate_higher_close(close, sma_high, sma_low):
-            self.higher_close = close
+        return condition
 
     def run(self):
         self.high_label = self.get_column_names("sma_[\d]+_0")
@@ -58,7 +53,8 @@ class Strategy(BaseStrategy):
         ticket = 0
         limit_low = None
         limit_high = None
-
+        self.higher_close = self.data.iloc[0]["close"]
+        new_close = False
         for (
             date, close, high, low, sma_high, sma_low, spread
         ) in zip(
@@ -75,10 +71,12 @@ class Strategy(BaseStrategy):
                 )
             ):
                 continue
-            self.update_higher_close(close, sma_high, sma_low)
+            if self.validate_higher_close(close, sma_high, sma_low):
+                self.higher_close = close
+                new_close = True
             if opened_position:
                 pos_info = self.get_position_by_ticket(ticket)
-                if self.validate_higher_close(close, sma_high, sma_low):
+                if new_close:
                     self.update_stop(pos_info, close, spread, sma_high, sma_low)
                 if (
                     (
@@ -120,5 +118,6 @@ class Strategy(BaseStrategy):
                 limit_low = True
             elif (close > sma_high):
                 limit_high = True
+            new_close = False
 
         return self.save_orders(f"{self.high_label}_{self.low_label}")
