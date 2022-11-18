@@ -23,6 +23,7 @@ class DataGetter:
         self.data.reset_index(drop=True, inplace=True)
         self.data.reset_index(inplace=True)
         self.data['date'] = pd.to_datetime(self.data['date'], format='%Y.%m.%d')
+        self.data.loc[self.data["spread"] == 0, "spread"] = 1
 
     def read_data_file(self):
         return
