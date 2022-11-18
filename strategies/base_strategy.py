@@ -95,13 +95,14 @@ class BaseStrategy:
             except InvalidStopException:
                 raise InvalidStopException(value, current_price)
         item_pos = self.orders.index(position)
-        position[option] = value
-        self.orders[item_pos] = position
+        self.orders[item_pos] = {
+            **position, f"{option}": value
+        }
 
     def validate_invalid_stop(self, close, stop_price, type_operation, spread):
         if (
-            (type_operation == self.BUY and stop_price < close)
+            (type_operation == self.BUY and stop_price > close)
             or
-            (type_operation == self.SELL and stop_price > (close + spread))
+            (type_operation == self.SELL and stop_price < (close + spread))
         ):
             raise InvalidStopException(stop_price, close)

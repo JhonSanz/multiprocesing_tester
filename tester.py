@@ -30,7 +30,7 @@ INDICATORS = [
 CORES = cpu_count()
 
 STRATEGY_PARAMS = {
-    "file": "two_means.dynamic_stop",
+    "file": "two_means.two_sma",
     "params": {
         "data_file": "eurusd/EURUSD_M10_201707010000_202209300000.csv",
         **EURUSD_PARAMS

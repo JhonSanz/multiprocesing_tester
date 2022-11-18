@@ -50,7 +50,7 @@ class Strategy(BaseStrategy):
             self.validate_stop_losses(date, high, low, spread)
             if (
                 not (
-                    date.time() >= datetime.strptime("01:59", "%H:%M").time()
+                    date.time() >= datetime.strptime("01:50", "%H:%M").time()
                     and
                     date.time() <= datetime.strptime("22:59", "%H:%M").time()
                 )

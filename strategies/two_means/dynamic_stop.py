@@ -7,7 +7,7 @@ class Strategy(BaseStrategy):
     UP_TREND = 1
     DOWN_TREND = -1
     RANGE = 0
-    STOP = 500
+    STOP = 200
     SPREAD = 10000000
 
     def __init__(self, data, decimals):
@@ -17,6 +17,7 @@ class Strategy(BaseStrategy):
         self.high_label = ""
         self.low_label = ""
         self.SPREAD *= self.decimals
+        self.STOP *= self.decimals
         self.higher_close = None
 
     def get_column_names(self, pattern):
@@ -27,16 +28,18 @@ class Strategy(BaseStrategy):
             map(lambda x: p.search(x), columns)
         ))[0].group(0)
 
-    def update_stop(self, pos_info, close, spread, sma_high, sma_low):
+    def update_stop(self, pos_info, close, spread, sma_high, sma_low, date):
+        if pos_info["direction"] != self._IN:
+            return
         if close < sma_low:
             new_stop = close + spread + self.STOP
         elif close > sma_high:
             new_stop = close - self.STOP
         try:
             self.edit_position(close, spread, pos_info, "stop_loss", new_stop)
-        except InvalidStopException:
-            pass
-    
+        except InvalidStopException as e:
+            pass # print(e, date)
+
     def validate_higher_close(self, close, sma_high, sma_low):
         condition = (
             (close < sma_low and self.higher_close > close)
@@ -65,7 +68,7 @@ class Strategy(BaseStrategy):
             self.validate_stop_losses(date, high, low, spread)
             if (
                 not (
-                    date.time() >= datetime.strptime("01:59", "%H:%M").time()
+                    date.time() >= datetime.strptime("01:50", "%H:%M").time()
                     and
                     date.time() <= datetime.strptime("22:59", "%H:%M").time()
                 )
@@ -77,7 +80,7 @@ class Strategy(BaseStrategy):
             if opened_position:
                 pos_info = self.get_position_by_ticket(ticket)
                 if new_close:
-                    self.update_stop(pos_info, close, spread, sma_high, sma_low)
+                    self.update_stop(pos_info, close, spread, sma_high, sma_low, date)
                 if (
                     (
                         pos_info["type"] == self.SELL
@@ -102,14 +105,14 @@ class Strategy(BaseStrategy):
                 if (high < sma_low and limit_high and spread <= self.SPREAD):
                     ticket = self.open_operation(
                         close, date, self.SELL, spread,
-                        close + (self.STOP * self.decimals)
+                        close + self.STOP
                     )
                     opened_position = True
                     limit_high = False
                 if (low > sma_high and limit_low and spread <= self.SPREAD):
                     ticket = self.open_operation(
                         close, date, self.BUY, spread,
-                        close - (self.STOP * self.decimals)
+                        close - self.STOP
                     )
                     opened_position = True
                     limit_low = False
