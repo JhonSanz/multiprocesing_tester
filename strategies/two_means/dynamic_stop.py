@@ -7,7 +7,7 @@ class Strategy(BaseStrategy):
     UP_TREND = 1
     DOWN_TREND = -1
     RANGE = 0
-    STOP = 200
+    STOP = 1000
     SPREAD = 10000000
 
     def __init__(self, data, decimals):
@@ -65,7 +65,6 @@ class Strategy(BaseStrategy):
             _data[f"{self.high_label}"], _data[f"{self.low_label}"], _data["spread"]
         ):
             spread = spread * self.decimals
-            self.validate_stop_losses(date, high, low, spread)
             if (
                 not (
                     date.time() >= datetime.strptime("01:50", "%H:%M").time()
@@ -74,6 +73,7 @@ class Strategy(BaseStrategy):
                 )
             ):
                 continue
+            self.validate_stop_losses(date, high, low, spread)
             if self.validate_higher_close(close, sma_high, sma_low):
                 self.higher_close = close
                 new_close = True

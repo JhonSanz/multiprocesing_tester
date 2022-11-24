@@ -12,3 +12,7 @@ EURUSD_PARAMS = {
     "contract_size": 100000
 }
 
+CONFIGS = {
+    "us100": {**US100_PARAMS},
+    "eurusd": {**EURUSD_PARAMS}
+}

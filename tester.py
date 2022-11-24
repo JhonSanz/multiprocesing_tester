@@ -4,13 +4,13 @@ from concurrent.futures import ProcessPoolExecutor
 from multiprocessing import cpu_count
 from main import run_strategy
 import numpy as np
-from strategies.configs import US100_PARAMS, EURUSD_PARAMS
+from strategies.configs import CONFIGS
 
 INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(715, 716)]
+            "length": [i for i in range(500, 501)]
         }, 
         "config_params": {
             "close": "high"
@@ -19,7 +19,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(715, 716)]
+            "length": [i for i in range(500, 501)]
         }, 
         "config_params": {
             "close": "low"
@@ -30,10 +30,11 @@ INDICATORS = [
 CORES = cpu_count()
 
 STRATEGY_PARAMS = {
-    "file": "two_means.two_sma",
+    "file": "two_means.dynamic_stop",
     "params": {
+        # "data_file": "us100/NAS100_M10_201707030100_202209292350.csv",
         "data_file": "eurusd/EURUSD_M10_201707010000_202209300000.csv",
-        **EURUSD_PARAMS
+        **CONFIGS["eurusd"]
     }
 }
 

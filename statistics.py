@@ -13,10 +13,6 @@ class Statistics:
         orders = self.data.copy()
         orders['total'] = orders['price_close'] - orders['price_open']
         orders.loc[orders['type'] == self.SELL, 'total'] = orders['total'] * (-1)
-        orders = orders[[
-            'date_open', 'price_open', 'date_close',
-            'price_close', 'type', 'total',
-        ]]
         orders["total"] = orders["total"].apply(lambda x: self.pips_calculator.profit(x))
         orders.to_csv(f"totals/{'_'.join(map(str, self.indicators))}_totals.csv")
         return orders

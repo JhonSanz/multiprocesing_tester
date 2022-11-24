@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime, timedelta
 
-df = pd.read_csv("totals/715_715_totals.csv", index_col=[0])
+df = pd.read_csv("totals/500_500_totals.csv", index_col=[0])
 df['date_open'] = pd.to_datetime(df['date_open'], format='%Y-%m-%d %H:%M')
 df['date_open'] = df['date_open'] + timedelta(minutes=10)
 df['date_open'] = df['date_open'].dt.strftime('%Y.%m.%d %H:%M:%S')
