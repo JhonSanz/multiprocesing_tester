@@ -14,7 +14,7 @@ def run_strategy(config_value, indicators_params, strategy_params):
         indicators_params,
         data_getter.data
     ).choose_algorithms()
-    print("Spreads", sorted(data_indicators["spread"].unique()))
+    # print("Spreads", sorted(data_indicators["spread"].unique()))
     print(colored("Calculando estrategia", "yellow"))
     orders = StrategySelector(
         strategy_params["file"], data_indicators,

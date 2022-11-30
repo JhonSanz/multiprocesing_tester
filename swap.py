@@ -29,10 +29,8 @@ class Swap:
     def compute_swap(self, row):
         total = 0
         days = self.compute_days(row)
-        print("days", days)
         for i in range(days):
             new_day = row["date_open"] + timedelta(days=i)
-            print(new_day)
             total += self.formula(new_day, row)
         return total
 
