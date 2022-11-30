@@ -76,7 +76,7 @@ class BaseStrategy:
     def save_orders(self, filename):
         df = pd.DataFrame(data=self.orders)
         df = df.drop("direction", axis=1)
-        df.to_csv(f"orders/{filename}_orders.csv")
+        # df.to_csv(f"orders/{filename}_orders.csv")
         return df
 
     def edit_position(self, current_price, spread, position, option, value):
