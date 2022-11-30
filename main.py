@@ -21,10 +21,5 @@ def run_strategy(config_value, indicators_params, strategy_params):
         strategy_params["params"]["decimals"]
     ).run_strategy()
     orders.dropna(inplace=True)
-    pips_calculatior = Pips(
-        strategy_params["params"]["decimals"],
-        strategy_params["params"]["volume"],
-        strategy_params["params"]["contract_size"],
-    )
-    result = Statistics(orders, config_value, pips_calculatior).run()
+    result = Statistics(orders, config_value, strategy_params).run()
     return result["total"].sum() + strategy_params["params"]["deposit"]
