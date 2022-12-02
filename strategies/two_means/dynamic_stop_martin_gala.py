@@ -7,8 +7,9 @@ class Strategy(BaseStrategy):
     UP_TREND = 1
     DOWN_TREND = -1
     RANGE = 0
-    STOP = 700
+    STOP = 500
     SPREAD = 10000000
+    VOLUME = 0.1
 
     def __init__(self, data, decimals):
         super().__init__()
@@ -19,6 +20,7 @@ class Strategy(BaseStrategy):
         self.SPREAD *= self.decimals
         self.STOP *= self.decimals
         self.higher_close = None
+        self.martin_gala = 0
 
     def get_column_names(self, pattern):
         columns = self.data.columns
@@ -48,6 +50,21 @@ class Strategy(BaseStrategy):
         )
         return condition
 
+    def calculate_martin_gala(self, close, price_open, _type):
+        if (
+            (close - price_open) < 0
+            if _type == self.BUY else
+            (price_open - close) < 0
+        ):
+            self.martin_gala += 1
+        elif (
+            (close - price_open) > 0
+            if _type == self.BUY else
+            (price_open - close) > 0
+        ):
+            self.martin_gala = 0
+        return
+
     def run(self):
         self.high_label = self.get_column_names("sma_[\d]+_0")
         self.low_label = self.get_column_names("sma_[\d]+_1")
@@ -58,6 +75,7 @@ class Strategy(BaseStrategy):
         limit_high = None
         self.higher_close = self.data.iloc[0]["close"]
         new_close = False
+        martin_gala = 0
         for (
             date, close, high, low, sma_high, sma_low, spread
         ) in zip(
@@ -89,6 +107,7 @@ class Strategy(BaseStrategy):
                         and close > sma_high
                     )
                 ):
+                    self.calculate_martin_gala(close, pos_info["price_open"], pos_info["type"])
                     self.close_operation(pos_info["date_open"], date, close)
                     opened_position = False
                 if (
@@ -99,19 +118,20 @@ class Strategy(BaseStrategy):
                         and close < sma_high
                     )
                 ):
+                    self.calculate_martin_gala(close, pos_info["price_open"], pos_info["type"])
                     self.close_operation(pos_info["date_open"], date, close)
                     opened_position = False
             if not opened_position:
                 if (high < sma_low and limit_high and spread <= self.SPREAD):
                     ticket = self.open_operation(
-                        close, date, self.SELL, spread,
+                        self.VOLUME + (0.1 * self.martin_gala), close, date, self.SELL, spread,
                         close + self.STOP
                     )
                     opened_position = True
                     limit_high = False
                 if (low > sma_high and limit_low and spread <= self.SPREAD):
                     ticket = self.open_operation(
-                        close, date, self.BUY, spread,
+                        self.VOLUME + (0.1 * self.martin_gala), close, date, self.BUY, spread,
                         close - self.STOP
                     )
                     opened_position = True

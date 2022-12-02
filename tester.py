@@ -33,6 +33,7 @@ STRATEGY_PARAMS = {
     "file": "two_means.dynamic_stop",
     "params": {
         # "data_file": "us100/NAS100_M10_201707030100_202209292350.csv",
+        # **CONFIGS["us100"]
         "data_file": "eurusd/EURUSD_M10_201707010000_202209300000.csv",
         **CONFIGS["eurusd"]
     }
