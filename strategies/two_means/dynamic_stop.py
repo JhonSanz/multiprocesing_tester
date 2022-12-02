@@ -59,9 +59,9 @@ class Strategy(BaseStrategy):
         self.higher_close = self.data.iloc[0]["close"]
         new_close = False
         for (
-            date, close, high, low, sma_high, sma_low, spread
+            date, close, _open, high, low, sma_high, sma_low, spread
         ) in zip(
-            _data["date"], _data["close"],  _data["high"],  _data["low"],
+            _data["date"], _data["close"], _data["open"], _data["high"],  _data["low"],
             _data[f"{self.high_label}"], _data[f"{self.low_label}"], _data["spread"]
         ):
             spread = spread * self.decimals
@@ -73,7 +73,11 @@ class Strategy(BaseStrategy):
                 )
             ):
                 continue
-            self.validate_stop_losses(date, high, low, spread)
+
+            self.validate_stop_losses(
+                date, high, low, spread,
+                close if date.time() == datetime.strptime("01:50", "%H:%M").time() else None,
+            )
             if self.validate_higher_close(close, sma_high, sma_low):
                 self.higher_close = close
                 new_close = True

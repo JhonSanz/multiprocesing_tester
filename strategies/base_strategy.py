@@ -1,5 +1,6 @@
 import pandas as pd
 from strategies.utils import InvalidStopException
+from datetime import datetime
 
 class BaseStrategy:
     BUY = 0
@@ -53,7 +54,7 @@ class BaseStrategy:
             position["stop_loss"] <= high + spread
         )
 
-    def validate_stop_losses(self, current_date, high, low, spread):
+    def validate_stop_losses(self, current_date, high, low, spread, price_close=None):
         orders = list(filter(
             lambda x: (
                 x["direction"] == self._IN and
@@ -66,8 +67,8 @@ class BaseStrategy:
         for operation in orders:
             self.close_operation(
                 operation["date_open"], current_date,
-                operation['stop_loss'],
-                f"Stop loss at {operation['stop_loss']}"
+                price_close or operation['stop_loss'],
+                f"Stop loss at {price_close or operation['stop_loss']}"
             )
 
     def get_position_by_ticket(self, ticket):
