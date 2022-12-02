@@ -1,7 +1,7 @@
 from get_data import DataGetter
 from indicators import Indicators
 from strategy_selector import StrategySelector
-from statistics import Statistics
+from generate_statistics import GenerateStatistics
 from termcolor import colored
 from pips import Pips
 
@@ -21,5 +21,5 @@ def run_strategy(config_value, indicators_params, strategy_params):
         strategy_params["params"]["decimals"]
     ).run_strategy()
     orders.dropna(inplace=True)
-    result = Statistics(orders, config_value, strategy_params).run()
+    result = GenerateStatistics(orders, config_value, strategy_params).run()
     return result["total"].sum() + strategy_params["params"]["deposit"]

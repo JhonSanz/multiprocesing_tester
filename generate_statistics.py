@@ -1,7 +1,7 @@
 from pips import Pips
 from swap import Swap
 
-class Statistics:
+class GenerateStatistics:
     BUY = 0
     SELL = 1
 
