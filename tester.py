@@ -5,12 +5,16 @@ from multiprocessing import cpu_count
 from main import run_strategy
 import numpy as np
 from strategies.configs import CONFIGS
+from join_files import results_concat
+import os
+import re
+import shutil
 
 INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(500, 501)]
+            "length": [i for i in range(200, 450)]
         }, 
         "config_params": {
             "close": "high"
@@ -19,7 +23,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(500, 501)]
+            "length": [i for i in range(200, 450)]
         }, 
         "config_params": {
             "close": "low"
@@ -80,3 +84,17 @@ if __name__ == '__main__':
         ]
         for future in proccessor:
             future.result()
+    
+    dirs = [x for x in os.listdir("./") if re.compile("test_results_*").search(x) is not None]
+    dirs = list(sorted(dirs))
+    new_dir = 1
+    if not dirs:
+        os.makedirs(f"test_results_{new_dir}")
+    else:
+        new_dir = int(dirs[-1].split('test_results_')[-1]) + 1
+        os.makedirs(f"test_results_{new_dir}")
+    for file in os.listdir("./"):
+        if file.split('.')[-1] == 'csv':
+            shutil.move(file, f"test_results_{new_dir}")
+    results_concat(f"test_results_{new_dir}", f"test_results_{new_dir}", new_dir)
+    # os.system("shutdown /s /t 1")
