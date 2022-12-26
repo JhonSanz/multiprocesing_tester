@@ -2,6 +2,7 @@ import os, glob
 from shutil import rmtree
 import argparse
 from termcolor import colored
+import re
 
 parser = argparse.ArgumentParser(
     description='''------- File with useful commands -------''',
@@ -28,15 +29,15 @@ def reset_orders():
         rmtree("orders")
         print(colored("Orders dir deleted", "green"))
     if not os.path.exists('orders'):
-        os.makedirs('orders')
+        # os.makedirs('orders')
+        pass
 
 def reset_results():
-    try:
-        for f in glob.glob("results_core*.csv"):
-            os.remove(f)
-        print(colored("Results file deleted", "green"))
-    except FileNotFoundError:
-        pass
+    dirs = [item for item in os.listdir(".") if re.compile("test_results_*").search(item) is not None]
+    for dir in dirs:
+        if os.path.exists(dir):
+            rmtree(dir)
+    print(colored("Results dirs deleted", "green"))
 
 def reset_all():
     value = input("Are you sure you want to delete all? (y/n): ")
