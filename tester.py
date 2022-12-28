@@ -14,7 +14,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(200, 450)]
+            "length": [i for i in range(5000, 6001)]
         }, 
         "config_params": {
             "close": "high"
@@ -23,7 +23,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(200, 450)]
+            "length": [i for i in range(5000, 6001)]
         }, 
         "config_params": {
             "close": "low"
@@ -36,7 +36,7 @@ CORES = cpu_count()
 STRATEGY_PARAMS = {
     "file": "two_means.dynamic_stop",
     "params": {
-        "data_file": "us100/NAS100_M10_201707030100_202209292350.csv",
+        "data_file": "us100/NAS100_M1_202101040100_202212232354.csv",
         **CONFIGS["us100"]
         # "data_file": "eurusd/EURUSD_M10_201707010000_202209300000.csv",
         # **CONFIGS["eurusd"]
@@ -68,6 +68,7 @@ class Tester:
 
 
 if __name__ == '__main__':
+    turn_pc_off = input("Apagar pc despues del backtesting? (y/n): ")
     product_values = list(map(lambda x: x["params"]["length"], INDICATORS))
     """------------------------------------------------------------ """
     """     Define the combination of your indicators' values.      """
@@ -97,4 +98,5 @@ if __name__ == '__main__':
         if file.split('.')[-1] == 'csv':
             shutil.move(file, f"test_results_{new_dir}")
     results_concat(f"test_results_{new_dir}", f"test_results_{new_dir}", new_dir)
-    # os.system("shutdown /s /t 1")
+    if turn_pc_off == "y":
+        os.system("shutdown /s /t 1")

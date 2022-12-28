@@ -7,7 +7,7 @@ class Strategy(BaseStrategy):
     UP_TREND = 1
     DOWN_TREND = -1
     RANGE = 0
-    STOP = 700
+    STOP = 2000
     SPREAD = 10000000
 
     def __init__(self, data, decimals):
