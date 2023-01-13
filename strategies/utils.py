@@ -4,3 +4,4 @@ class InvalidStopException(Exception):
         self.price = price
         self.message = f"Invalid stop {self.stop} at {self.price}"
         super().__init__(self.message)
+    

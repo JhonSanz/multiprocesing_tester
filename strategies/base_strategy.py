@@ -1,5 +1,4 @@
 import pandas as pd
-from strategies.utils import InvalidStopException
 from datetime import datetime
 
 class BaseStrategy:
@@ -10,6 +9,7 @@ class BaseStrategy:
 
     def __init__(self):
         self.orders = []
+        self.opened_position = False
 
     def open_operation(self, price, date, type, spread, stop_loss=None):
         real_price = 0
@@ -70,6 +70,7 @@ class BaseStrategy:
                 price_close or operation['stop_loss'],
                 f"Stop loss at {price_close or operation['stop_loss']}"
             )
+            self.opened_position = False
 
     def get_position_by_ticket(self, ticket):
         return self.orders[ticket]
@@ -80,7 +81,7 @@ class BaseStrategy:
         # df.to_csv(f"orders/{filename}_orders.csv")
         return df
 
-    def edit_position(self, current_price, spread, position, option, value):
+    def edit_position(self, current_price, spread, position, option, value, current_date):
         options = ["stop_loss", "take_profit"]
         if not option in options:
             raise Exception(f"""
@@ -88,22 +89,26 @@ class BaseStrategy:
                 Possible values are: {options}
             """)
         if option == "stop_loss":
-            try:
-                self.validate_invalid_stop(
-                    current_price, value,
-                    position["type"], spread
-                )
-            except InvalidStopException:
-                raise InvalidStopException(value, current_price)
+            self.validate_invalid_stop(
+                current_price, value,
+                position, spread, current_date
+            )
         item_pos = self.orders.index(position)
         self.orders[item_pos] = {
             **position, f"{option}": value
         }
 
-    def validate_invalid_stop(self, close, stop_price, type_operation, spread):
+    def validate_invalid_stop(self, close, stop_price, position, spread, current_date):
         if (
-            (type_operation == self.BUY and stop_price > close)
+            (position["type"] == self.BUY and stop_price > close)
             or
-            (type_operation == self.SELL and stop_price < (close + spread))
+            (position["type"] == self.SELL and stop_price < (close + spread))
         ):
-            raise InvalidStopException(stop_price, close)
+            raise Exception(f"""
+                Invalid stop: {stop_price} at current price: {close},
+                date_open: {position['date_open']},
+                date_close: {position['date_close']},
+                spread: {spread},
+                current_date: {current_date},
+                type_operation: {"BUY" if position['type'] == self.BUY else "SELL"},
+            """)

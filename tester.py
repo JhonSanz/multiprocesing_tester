@@ -14,7 +14,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(5000, 6001)]
+            "length": [i for i in range(4000, 4001, 1)]
         }, 
         "config_params": {
             "close": "high"
@@ -23,18 +23,29 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(5000, 6001)]
+            "length": [i for i in range(4000, 4001, 1)]
         }, 
         "config_params": {
             "close": "low"
         }
     },
+    {
+        "function": "atr",
+        "params": {
+            "length": [i for i in range(10, 11, 1)]
+        }, 
+        "config_params": {
+            "close": "close",
+            "high": "high",
+            "low": "low",
+        }
+    }
 ]
 
 CORES = cpu_count()
 
 STRATEGY_PARAMS = {
-    "file": "two_means.dynamic_stop",
+    "file": "two_means.two_means_atr_stop_loss",
     "params": {
         "data_file": "us100/NAS100_M1_202101040100_202212232354.csv",
         **CONFIGS["us100"]
@@ -66,17 +77,18 @@ class Tester:
                 df.loc[len(df)] = {"profit": data, "params": '_'.join(map(str, item))}
             df.to_csv(f"results_core{core}.csv", index=False)
 
+def permutations(values):
+    _product = list(product(*values))
+    result = list(filter(lambda x: x[0] == x[1], _product))
+    # _one_to_one = list(zip(product_values[0], product_values[1]))
+    return result
 
 if __name__ == '__main__':
     turn_pc_off = input("Apagar pc despues del backtesting? (y/n): ")
     product_values = list(map(lambda x: x["params"]["length"], INDICATORS))
-    """------------------------------------------------------------ """
-    """     Define the combination of your indicators' values.      """
-    """------------------------------------------------------------ """
-    # _product = list(product(*product_values))
-    _one_to_one = list(zip(product_values[0], product_values[1]))
-    """------------------------------------------------------------ """
-    splitted = np.array_split(_one_to_one, CORES)
+    _permutations = permutations(product_values)
+
+    splitted = np.array_split(_permutations, CORES)
     with ProcessPoolExecutor(max_workers=CORES) as executor:
         proccessor = [
             executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run, index, fragment)
