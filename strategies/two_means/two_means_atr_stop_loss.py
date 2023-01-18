@@ -7,8 +7,6 @@ from strategies.utils import InvalidStopException
 class Strategy(BaseStrategy):
     UP_TREND = 1
     DOWN_TREND = -1
-    RANGE = 0
-    STOP = 1700
     SPREAD = 10000000
     ATR_MULTIPLIER = 10
 
@@ -21,7 +19,6 @@ class Strategy(BaseStrategy):
         self.low_label = ""
         self.atr_label = ""
         self.SPREAD *= self.decimals
-        self.STOP *= self.decimals
         self.higher_close = None
 
     def get_column_names(self, pattern):
@@ -76,11 +73,21 @@ class Strategy(BaseStrategy):
             spread = spread * self.decimals
             if (
                 not (
-                    date.time() >= datetime.strptime("01:50", "%H:%M").time()
+                    date.time() >= datetime.strptime("01:59", "%H:%M").time()
                     and
                     date.time() <= datetime.strptime("22:59", "%H:%M").time()
                 )
             ):
+                if self.opened_position:
+                    pos_info = self.get_position_by_ticket(ticket)
+                    # Actualiza el stop loss en cada tick
+                    new_stop = self.update_atr_stop_loss(
+                        atr, close, pos_info["type"] == self.BUY,
+                        (close > _open)
+                    )
+                    if (new_stop != -1):
+                        self.edit_position(close, spread, pos_info, "stop_loss", new_stop, date)
+
                 continue
 
             self.validate_stop_losses(
@@ -142,4 +149,7 @@ class Strategy(BaseStrategy):
             elif (close > sma_high):
                 limit_high = True
 
-        return self.save_orders(f"{self.high_label}_{self.low_label}_{self.atr_label}")
+        return self.save_orders(f"""
+            {self.high_label}_{self.low_label}_{self.atr_label}
+            _{self.ATR_MULTIPLIER}
+        """)

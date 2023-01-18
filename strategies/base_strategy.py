@@ -49,9 +49,9 @@ class BaseStrategy:
 
     def stop_reasons(self, position, high, low, spread):
         return (
-            position["stop_loss"] >= low
+            position["stop_loss"] > low
             if position["type"] == self.BUY else
-            position["stop_loss"] <= high + spread
+            position["stop_loss"] < high + spread
         )
 
     def validate_stop_losses(self, current_date, high, low, spread, price_close=None):
