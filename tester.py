@@ -38,6 +38,7 @@ INDICATORS = [
             "close": "close",
             "high": "high",
             "low": "low",
+            "mamode": "sma"
         }
     }
 ]

@@ -55,6 +55,7 @@ class Strategy(BaseStrategy):
         self.low_label = self.get_column_names("sma_[\d]+_1")
         self.atr_label = self.get_column_names("atr_[\d]+_2")
         _data = self.data.copy()
+        _data[self.atr_label] = _data[self.atr_label].round(1)
         ticket = 0
         limit_low = None
         limit_high = None
