@@ -71,9 +71,14 @@ class Strategy(BaseStrategy):
             _data["spread"]
         ):
             spread = spread * self.decimals
+            """
+            Opera en el rango de tiempo
+            - Desde las 2 incluyendo las 2
+            - Hasta las 22:59 sin incluir las 23:00
+            """
             if (
                 not (
-                    date.time() >= datetime.strptime("01:59", "%H:%M").time()
+                    date.time() > datetime.strptime("01:59", "%H:%M").time()
                     and
                     date.time() <= datetime.strptime("22:59", "%H:%M").time()
                 )
@@ -92,7 +97,7 @@ class Strategy(BaseStrategy):
 
             self.validate_stop_losses(
                 date, high, low, spread,
-                close if date.time() == datetime.strptime("01:50", "%H:%M").time() else None,
+                close if date.time() == datetime.strptime("01:59", "%H:%M").time() else None,
             )
             if self.opened_position:
                 pos_info = self.get_position_by_ticket(ticket)
