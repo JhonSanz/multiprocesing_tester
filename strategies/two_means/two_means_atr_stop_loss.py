@@ -91,6 +91,7 @@ class Strategy(BaseStrategy):
                         (close > _open)
                     )
                     if (new_stop != -1):
+                        new_stop = new_stop + spread if pos_info["type"] == self.SELL else new_stop
                         self.edit_position(close, spread, pos_info, "stop_loss", new_stop, date)
 
                 continue
@@ -107,6 +108,7 @@ class Strategy(BaseStrategy):
                     (close > _open)
                 )
                 if (new_stop != -1):
+                    new_stop = new_stop + spread if pos_info["type"] == self.SELL else new_stop
                     self.edit_position(close, spread, pos_info, "stop_loss", new_stop, date)
 
                 # Cierra la operacion cuando cruza otra vez las medias en la tendencia contraria
@@ -132,7 +134,7 @@ class Strategy(BaseStrategy):
                     self.opened_position = False
             if not self.opened_position:
                 if (high < sma_low and limit_high and spread <= self.SPREAD):
-                    position_stop = self.get_atr_stop_loss(atr, close, False)
+                    position_stop = self.get_atr_stop_loss(atr, close, False) + spread
                     ticket = self.open_operation(
                         close, date, self.SELL, spread,
                         position_stop

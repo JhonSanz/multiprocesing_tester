@@ -14,7 +14,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(4000, 4001, 1)]
+            "length": [100, 1000] # i for i in range(4000, 4005, 1)]
         }, 
         "config_params": {
             "close": "high"
@@ -23,7 +23,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [i for i in range(4000, 4001, 1)]
+            "length": [100, 1000] # i for i in range(4000, 4005, 1)]
         }, 
         "config_params": {
             "close": "low"
@@ -52,7 +52,8 @@ STRATEGY_PARAMS = {
         **CONFIGS["us100"]
         # "data_file": "eurusd/EURUSD_M10_201707010000_202209300000.csv",
         # **CONFIGS["eurusd"]
-    }
+    },
+    "start_date": "2022-06-13 05:04:00"
 }
 
 class Tester:
