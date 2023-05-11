@@ -14,7 +14,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [100, 1000] # i for i in range(4000, 4005, 1)]
+            "length": [100, 101] # i for i in range(4000, 4005, 1)]
         }, 
         "config_params": {
             "close": "high"
@@ -23,7 +23,7 @@ INDICATORS = [
     {
         "function": "sma",
         "params": {
-            "length": [100, 1000] # i for i in range(4000, 4005, 1)]
+            "length": [100, 101] # i for i in range(4000, 4005, 1)]
         }, 
         "config_params": {
             "close": "low"
@@ -61,7 +61,8 @@ class Tester:
         self.indicators = indicators
         self.strategy_params = strategy_params
     
-    def run(self, core, _one_to_one):
+    def run(self, param):
+        core, _one_to_one = param
         try:
             df = pd.read_csv(f"results_core{core}.csv")
         except FileNotFoundError:
@@ -92,13 +93,18 @@ if __name__ == '__main__':
 
     splitted = np.array_split(_permutations, CORES)
     with ProcessPoolExecutor(max_workers=CORES) as executor:
-        proccessor = [
-            executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run, index, fragment)
-            for index, fragment in enumerate(splitted)
-            if len(fragment) > 0
-        ]
-        for future in proccessor:
-            future.result()
+        # proccessor = [
+        #     executor.submit(Tester(INDICATORS, STRATEGY_PARAMS).run, index, fragment)
+        #     for index, fragment in enumerate(splitted)
+        #     if len(fragment) > 0
+        # ]
+        # for future in proccessor:
+        #     future.result()
+
+        executor.map(
+            Tester(INDICATORS, STRATEGY_PARAMS).run,
+            [(index, fragment) for index, fragment in enumerate(splitted) if len(fragment) > 0]
+        )
     
     dirs = [x for x in os.listdir("./") if re.compile("test_results_*").search(x) is not None]
     dirs = list(sorted(dirs))
